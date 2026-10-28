@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foresight 2027 — Choose your forecaster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Barlow+Condensed:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#120a24;
+    --dusk:#2a1352;
+    --ember:#ffb21a;
+    --flare:#ff4d2e;
+    --ice:#3fe0ff;
+    --bone:#f3ead8;
+    --steel:#6b5d8a;
+    --display:"Bungee","Impact","Arial Black",sans-serif;
+    --body:"Barlow Condensed","Arial Narrow",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#05020b;overflow:hidden}
+  body{display:grid;place-items:center;font-family:var(--body);color:var(--bone)}
+
+  /* 16:9 stage, scaled to fit the window */
+  #stage{
+    position:relative;width:1600px;height:900px;flex:none;
+    transform-origin:center center;
+    background:
+      radial-gradient(ellipse 60% 55% at 50% 52%, rgba(255,77,46,.22), transparent 70%),
+      radial-gradient(ellipse 90% 70% at 50% 120%, rgba(255,178,26,.25), transparent 60%),
+      linear-gradient(180deg,var(--void) 0%,var(--dusk) 70%,#3a1030 100%);
+    overflow:hidden;
+  }
+  /* slow drifting embers */
+  #stage::before{
+    content:"";position:absolute;inset:-50%;
+    background-image:
+      radial-gradient(2px 2px at 20% 30%, rgba(255,178,26,.7), transparent 60%),
+      radial-gradient(1.5px 1.5px at 70% 60%, rgba(255,77,46,.7), transparent 60%),
+      radial-gradient(2px 2px at 40% 80%, rgba(255,178,26,.5), transparent 60%),
+      radial-gradient(1px 1px at 85% 20%, rgba(243,234,216,.6), transparent 60%),
+      radial-gradient(1.5px 1.5px at 10% 70%, rgba(255,77,46,.6), transparent 60%);
+    background-size:400px 400px;
+    animation:drift 22s linear infinite;opacity:.8;pointer-events:none;
+  }
+  @keyframes drift{to{transform:translateY(-400px)}}
+  /* scanlines */
+  #stage::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 2px,transparent 2px 4px);
+    mix-blend-mode:multiply;
+  }
+
+  header{position:absolute;top:34px;left:0;right:0;text-align:center;z-index:2}
+  header h1{
+    font-family:var(--display);font-size:54px;letter-spacing:2px;line-height:1;
+    color:var(--ember);
+    text-shadow:0 3px 0 var(--flare),0 6px 0 #6a1420,0 0 30px rgba(255,120,30,.6);
+  }
+  header p{margin-top:10px;font-size:24px;font-weight:500;color:#cdbfe6;letter-spacing:1px}
+
+  /* side portraits */
+  .side{
+    position:absolute;top:150px;width:350px;height:600px;z-index:2;
+  }
+  .side.p1{left:40px}
+  .side.p2{right:40px}
+  .side .frame{
+    position:absolute;inset:0;overflow:hidden;
+    clip-path:polygon(0 0,100% 0,100% 88%,88% 100%,0 100%);
+    background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,.35));
+    border:0;
+  }
+  .side.p2 .frame{clip-path:polygon(0 0,100% 0,100% 100%,12% 100%,0 88%)}
+  .side .frame::before{
+    content:"";position:absolute;inset:0;border:3px solid var(--steel);
+    clip-path:inherit;z-index:3;pointer-events:none;
+  }
+  .side.p1.live .frame::before{border-color:var(--ember)}
+  .side.p2.live .frame::before{border-color:var(--ice)}
+  .side img{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;
+    opacity:0;transform:scale(1.08);transition:opacity .25s,transform .4s;
+  }
+  .side img.on{opacity:1;transform:scale(1)}
+  .side .tag{
+    position:absolute;top:-34px;font-family:var(--display);font-size:22px;letter-spacing:1px;
+  }
+  .side.p1 .tag{left:0;color:var(--ember)}
+  .side.p2 .tag{right:0;color:var(--ice)}
+  .side .plate{
+    position:absolute;left:0;right:0;bottom:-90px;text-align:center;
+  }
+  .side .plate .nm{
+    font-family:var(--display);font-size:30px;line-height:1.05;
+    text-shadow:0 3px 0 rgba(0,0,0,.6);
+  }
+  .side.p1 .plate .nm{color:var(--ember)}
+  .side.p2 .plate .nm{color:var(--ice)}
+  .side .plate .rl{margin-top:6px;font-size:20px;color:#cdbfe6;line-height:1.15}
+  .side .lock{
+    position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) scale(2.4);
+    font-family:var(--display);font-size:46px;z-index:4;opacity:0;pointer-events:none;
+    white-space:nowrap;
+  }
+  .side.p1 .lock{color:var(--ember);text-shadow:0 0 24px var(--flare)}
+  .side.p2 .lock{color:var(--ice);text-shadow:0 0 24px #1a6cff}
+  .side .lock.go{animation:lockin .7s cubic-bezier(.2,1.4,.4,1) forwards}
+  @keyframes lockin{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(2.4)}
+    60%{opacity:1;transform:translate(-50%,-50%) scale(.92)}
+    100%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  }
+
+  /* roster grid */
+  #grid{
+    position:absolute;left:50%;top:170px;transform:translateX(-50%);
+    display:grid;grid-template-columns:repeat(6,112px);grid-auto-rows:134px;gap:10px;z-index:2;
+  }
+  .tile{
+    position:relative;overflow:hidden;background:#1b0f33;
+    clip-path:polygon(10% 0,100% 0,90% 100%,0 100%);
+  }
+  .tile img{
+    width:100%;height:100%;object-fit:cover;object-position:center 20%;
+    filter:grayscale(.85) brightness(.6) contrast(1.1);transition:filter .15s;
+  }
+  .tile .ini{
+    position:absolute;inset:0;display:grid;place-items:center;
+    font-family:var(--display);font-size:30px;color:var(--steel);
+  }
+  .tile.rand{display:grid;place-items:center;background:linear-gradient(160deg,#2b1650,#140a28)}
+  .tile.rand span{font-family:var(--display);font-size:64px;color:var(--steel)}
+  .tile.hot1 img,.tile.hot2 img,.tile.taken img{filter:none}
+  .tile .ring{position:absolute;inset:0;pointer-events:none;clip-path:inherit}
+  .tile.hot1 .ring{box-shadow:inset 0 0 0 5px var(--ember),inset 0 0 26px rgba(255,178,26,.7)}
+  .tile.hot2 .ring{box-shadow:inset 0 0 0 5px var(--ice),inset 0 0 26px rgba(63,224,255,.7)}
+  .tile.hot1.hot2 .ring{box-shadow:inset 0 0 0 5px var(--ember),inset 0 0 0 10px var(--ice)}
+  .tile .badge{
+    position:absolute;top:4px;font-family:var(--display);font-size:15px;padding:1px 6px;
+    opacity:0;
+  }
+  .tile .b1{left:14px;background:var(--ember);color:var(--void)}
+  .tile .b2{right:14px;background:var(--ice);color:var(--void)}
+  .tile.hot1 .b1,.tile.hot2 .b2{opacity:1}
+
+  /* hovered name under the grid */
+  #hover{
+    position:absolute;left:50%;top:752px;transform:translateX(-50%);text-align:center;z-index:2;width:760px;
+  }
+  #hover .nm{font-family:var(--display);font-size:40px;letter-spacing:1px;line-height:1}
+  #hover .rl{margin-top:8px;font-size:24px;color:#cdbfe6}
+
+  footer{
+    position:absolute;bottom:22px;left:0;right:0;text-align:center;z-index:2;
+    font-size:20px;color:#9a8bbb;letter-spacing:1px;
+  }
+
+  /* versus screen */
+  #vs{position:absolute;inset:0;z-index:10;pointer-events:none;opacity:0;transition:opacity .2s}
+  #vs.show{opacity:1}
+  #vs .half{
+    position:absolute;top:0;bottom:0;width:58%;overflow:hidden;
+  }
+  #vs .l{left:0;clip-path:polygon(0 0,100% 0,72% 100%,0 100%);
+    background:linear-gradient(120deg,#5a1a08,#b8400e);transform:translateX(-100%)}
+  #vs .r{right:0;clip-path:polygon(28% 0,100% 0,100% 100%,0 100%);
+    background:linear-gradient(240deg,#06244a,#0a5a8a);transform:translateX(100%)}
+  #vs.show .l,#vs.show .r{transform:none;transition:transform .45s cubic-bezier(.2,1.1,.3,1)}
+  #vs .half img{
+    position:absolute;bottom:0;height:92%;width:auto;max-width:none;
+    filter:drop-shadow(0 0 30px rgba(0,0,0,.6));
+    -webkit-mask-image:linear-gradient(180deg,#000 70%,transparent 100%);
+            mask-image:linear-gradient(180deg,#000 70%,transparent 100%);
+  }
+  #vs .l img{left:6%}
+  #vs .r img{right:6%}
+  #vs .who{position:absolute;bottom:120px;font-family:var(--display);font-size:46px;line-height:1;
+    text-shadow:0 4px 0 rgba(0,0,0,.55)}
+  #vs .l .who{left:60px;color:var(--ember)}
+  #vs .r .who{right:60px;color:var(--ice);text-align:right}
+  #vs .big{
+    position:absolute;left:50%;top:40%;transform:translate(-50%,-50%) scale(4);opacity:0;
+    font-family:var(--display);font-size:200px;line-height:1;color:var(--bone);
+    text-shadow:0 8px 0 var(--flare),0 16px 0 #6a1420,0 0 60px rgba(255,140,40,.9);
+  }
+  #vs.show .big{animation:slam .5s .35s cubic-bezier(.2,1.5,.4,1) forwards}
+  @keyframes slam{to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+  #vs .topic{
+    position:absolute;left:50%;bottom:44px;transform:translateX(-50%);width:1100px;text-align:center;
+    opacity:0;
+  }
+  #vs.show .topic{animation:rise .5s .8s ease-out forwards}
+  @keyframes rise{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
+  #vs .topic .t{font-size:36px;font-weight:700;line-height:1.1;background:rgba(18,10,36,.85);
+    display:inline-block;padding:10px 26px}
+  #vs .topic .d{margin-top:10px;font-family:var(--display);font-size:24px;color:var(--ember)}
+
+  @media (prefers-reduced-motion: reduce){
+    #stage::before{animation:none}
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <header>
+    <h1>Choose your forecaster</h1>
+    <p>Foresight 2027 · Search, Social &amp; AI · Dec 8, online</p>
+  </header>
+
+  <div class="side p1" id="p1">
+    <div class="tag">Player 1</div>
+    <div class="frame"><img alt=""></div>
+    <div class="lock">Locked in</div>
+    <div class="plate"><div class="nm"></div><div class="rl"></div></div>
+  </div>
+  <div class="side p2" id="p2">
+    <div class="tag">Player 2</div>
+    <div class="frame"><img alt=""></div>
+    <div class="lock">Locked in</div>
+    <div class="plate"><div class="nm"></div><div class="rl"></div></div>
+  </div>
+
+  <div id="grid"></div>
+  <div id="hover"><div class="nm"></div><div class="rl"></div></div>
+  <footer>23 speakers · 1 conference · zero scripted answers</footer>
+
+  <div id="vs">
+    <div class="half l"><img alt=""><div class="who"></div></div>
+    <div class="half r"><img alt=""><div class="who"></div></div>
+    <div class="big">VS</div>
+    <div class="topic"><div class="t"></div><div class="d">Foresight 2027 · Dec 8</div></div>
+  </div>
+</div>
+
+<script>
+const U = "https://seranking.com/wp-content/uploads/sites/9/2026/";
+const S = [
+  ["Mordy Oberstein","Head of Brand, SE Ranking","05/mordy-oberstein-media.png"],
+  ["Andreea Stefan","Growth & Search Lead, Planable","10/andreea-stefan-media.png"],
+  ["Janine Anderson","Senior Web Marketing Manager, Zapier","10/janine-anderson-media.png"],
+  ["Crystal Carter","Head of SEO Communications, Wix","10/shheshhlplrd-media.png"],
+  ["Ross Simmonds","Founder & CEO, Foundation Marketing","10/speaker-photo-1-media.png"],
+  ["Kevin Indig","Growth Advisor, Growth Memo","10/kevin-indig-media.png"],
+  ["Graham Todd","Co-Founder, Spaghetti Agency","10/graham-todd-media.png"],
+  ["Kiera Carter","Editorial Director, Wix","10/kskfoig-media.png"],
+  ["Sarah Adam","Head of Growth Partnerships, Wix","10/sarah-adam-media.png"],
+  ["Peter Mollins","CMO, SE Ranking","10/zueuk-media.png"],
+  ["Alex Wright","MD Earned & Owned Media, IDHL","10/alex-wright-media.png"],
+  ["Scott Hircombe","Co-Founder, Parameter Marketing","10/photo-media.png"],
+  ["Kaleigh Moore","AEO Strategist, B2B SaaS","10/fhdjjdkkwsi-media.png"],
+  ["Nick LeRoy","Owner, Nick LeRoy Consulting","10/photo-2-media.png"],
+  ["Barry Schwartz","CEO, RustyBrick","10/photo-3-media.png"],
+  ["Cyrus Shepard","Founder, Zyppy SEO","10/cyrus-shepard-media.png"],
+  ["Dayana Collazos Ibarra","Pretty Little Marketer","10/dayana-collazos-ibarra-media.png"],
+  ["Jillian Ryan","Content Strategy, Intuit Mailchimp","10/jillian-ryan-media.png"],
+  ["Joe Glover","Co-Founder, The Marketing Meetup","10/joe-glover-1-media.png"],
+  ["Aleyda Solís","Founder, Orainti","10/aleyda-solis-media.png"],
+  ["Anthony Barone","Co-Founder, StudioHawk UK","10/anthony-barone-media.png"],
+  ["Filipa Canelas","Co-Founder, MKTK","10/filipa-canelas-media.png"],
+  ["Yoel Israel","Founder & CEO, WadiDigital","10/yoel-israel-media.png"],
+].map(([n,r,p])=>({n,r,src:U+p}));
+
+const byName = n => S.findIndex(s=>s.n===n);
+// real session pairings from the agenda
+const BOUTS = [
+  ["Ross Simmonds","Kevin Indig","Discovery and the customer journey in 2027"],
+  ["Janine Anderson","Crystal Carter","Keynote: what if the rift between publishers and Google widens?"],
+  ["Kaleigh Moore","Nick LeRoy","What’s really coming if the AI bubble pops"],
+  ["Alex Wright","Scott Hircombe","Agentic for production vs agentic for insights"],
+  ["Kiera Carter","Peter Mollins","Brand visibility in 2027: what winning looks like"],
+  ["Cyrus Shepard","Jillian Ryan","“Less traffic overall”: what’s the game plan?"],
+  ["Aleyda Solís","Joe Glover","Panel: what’s actually changing in 2027"],
+  ["Mordy Oberstein","Andreea Stefan","Opening round: welcome to Foresight 2027"],
+];
+
+const COLS = 6;
+const grid = document.getElementById("grid");
+const tiles = S.map((s,i)=>{
+  const t = document.createElement("div");
+  t.className = "tile";
+  const ini = s.n.split(" ").map(w=>w[0]).slice(0,2).join("");
+  t.innerHTML = `<div class="ini">${ini}</div><img alt="${s.n}" src="${s.src}"><div class="ring"></div><span class="badge b1">1P</span><span class="badge b2">2P</span>`;
+  t.querySelector("img").onerror = e => e.target.remove();
+  grid.appendChild(t);
+  return t;
+});
+const rnd = document.createElement("div");
+rnd.className = "tile rand";
+rnd.innerHTML = `<span>?</span><div class="ring"></div><span class="badge b1">1P</span><span class="badge b2">2P</span>`;
+grid.appendChild(rnd);
+tiles.push(rnd);
+const N = tiles.length; // 24
+
+const $ = (sel,root=document)=>root.querySelector(sel);
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const hover = $("#hover");
+const pos = {1:0, 2:5};
+
+function setHover(i,p){
+  tiles.forEach(t=>t.classList.remove("hot"+p));
+  tiles[i].classList.add("hot"+p);
+  pos[p] = i;
+  const s = S[i];
+  $(".nm",hover).textContent = s ? s.n : "Random fighter";
+  $(".nm",hover).style.color = p===1 ? "var(--ember)" : "var(--ice)";
+  $(".rl",hover).textContent = s ? s.r : "Who will it be?";
+  const side = $("#p"+p);
+  const img = $("img",side);
+  if (s){
+    img.classList.remove("on");
+    img.src = s.src;
+    requestAnimationFrame(()=>img.classList.add("on"));
+  } else img.classList.remove("on");
+}
+
+// roam: a few random hops, then walk the grid to the target
+function path(from,to,hops){
+  const out=[]; let c=from;
+  for(let k=0;k<hops;k++){
+    let n; do{ n=Math.floor(Math.random()*N) }while(n===c);
+    // step only to a neighbour so it reads like a cursor
+    const r=Math.floor(c/COLS), col=c%COLS;
+    const opts=[[r-1,col],[r+1,col],[r,col-1],[r,col+1]]
+      .filter(([a,b])=>a>=0&&b>=0&&b<COLS&&a*COLS+b<N).map(([a,b])=>a*COLS+b);
+    c = opts[Math.floor(Math.random()*opts.length)];
+    out.push(c);
+  }
+  while(c!==to){
+    const r=Math.floor(c/COLS), col=c%COLS, tr=Math.floor(to/COLS), tc=to%COLS;
+    if(r!==tr && (col===tc || Math.random()<.5)) c += (tr>r?COLS:-COLS);
+    else c += (tc>col?1:-1);
+    out.push(c);
+  }
+  return out;
+}
+
+async function pick(p,target){
+  const side=$("#p"+p);
+  side.classList.add("live");
+  const steps = path(pos[p],target,6+Math.floor(Math.random()*4));
+  for(let k=0;k<steps.length;k++){
+    setHover(steps[k],p);
+    const left = steps.length-k;
+    await sleep(left>4 ? 140 : 140 + (5-left)*90); // slows as it closes in
+  }
+  await sleep(250);
+  const s=S[target];
+  $(".nm",side).textContent=s.n;
+  $(".rl",side).textContent=s.r;
+  tiles[target].classList.add("taken");
+  const lock=$(".lock",side);
+  lock.classList.remove("go"); void lock.offsetWidth; lock.classList.add("go");
+  await sleep(1100);
+}
+
+function resetRound(){
+  ["#p1","#p2"].forEach(id=>{
+    const side=$(id);
+    side.classList.remove("live");
+    $(".lock",side).classList.remove("go");
+    $(".nm",side).textContent="";
+    $(".rl",side).textContent="";
+    $("img",side).classList.remove("on");
+  });
+  tiles.forEach(t=>t.classList.remove("hot1","hot2","taken"));
+}
+
+async function versus(a,b,topic){
+  const vs=$("#vs");
+  $(".l img",vs).src=S[a].src; $(".l .who",vs).textContent=S[a].n;
+  $(".r img",vs).src=S[b].src; $(".r .who",vs).textContent=S[b].n;
+  $(".topic .t",vs).textContent=topic;
+  vs.classList.remove("show"); void vs.offsetWidth; vs.classList.add("show");
+  await sleep(3600);
+  vs.classList.remove("show");
+  await sleep(400);
+}
+
+// warm the image cache so swaps are instant
+S.forEach(s=>{const i=new Image(); i.src=s.src});
+
+(async function loop(){
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let k=0;
+  while(true){
+    const [a,b,topic]=BOUTS[k%BOUTS.length];
+    const ia=byName(a), ib=byName(b);
+    resetRound();
+    setHover(pos[1],1);
+    await sleep(500);
+    if(reduce){ setHover(ia,1); setHover(ib,2); await sleep(1200) }
+    else { await pick(1,ia); await pick(2,ib); }
+    await versus(ia,ib,topic);
+    k++;
+  }
+})();
+
+// fit the 1600×900 stage to any window
+function fit(){
+  const s=Math.min(innerWidth/1600, innerHeight/900);
+  document.getElementById("stage").style.transform=`scale(${s})`;
+}
+addEventListener("resize",fit); fit();
+</script>
+</body>
+</html>
