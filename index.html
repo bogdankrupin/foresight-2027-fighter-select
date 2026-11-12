@@ -225,7 +225,7 @@
 
   <div id="grid"></div>
   <div id="hover"><div class="nm"></div><div class="rl"></div></div>
-  <footer>23 speakers · 1 conference · zero scripted answers</footer>
+  <footer>24 speakers · 1 conference · zero scripted answers</footer>
 
   <div id="vs">
     <div class="half l"><img alt=""><div class="who"></div></div>
@@ -246,12 +246,13 @@ const S = [
   ["Kevin Indig","Growth Advisor, Growth Memo","10/kevin-indig-media.png"],
   ["Graham Todd","Co-Founder, Spaghetti Agency","10/graham-todd-media.png"],
   ["Kiera Carter","Editorial Director, Wix","10/kskfoig-media.png"],
-  ["Sarah Adam","Head of Growth Partnerships, Wix","10/sarah-adam-media.png"],
+  ["Rebecca Tomasis","Head of Organic Growth, Wix","10/rebecca-tomasis-media.png"],
   ["Peter Mollins","CMO, SE Ranking","10/zueuk-media.png"],
   ["Alex Wright","MD Earned & Owned Media, IDHL","10/alex-wright-media.png"],
   ["Scott Hircombe","Co-Founder, Parameter Marketing","10/photo-media.png"],
   ["Kaleigh Moore","AEO Strategist, B2B SaaS","10/fhdjjdkkwsi-media.png"],
-  ["Nick LeRoy","Owner, Nick LeRoy Consulting","10/photo-2-media.png"],
+  ["Nick LeRoy","Owner, Nick LeRoy Consulting","10/nick-leroy-media.png"],
+  ["Garrett Sussman","Director of Marketing, iPullRank","10/fjfkolps-media.png"],
   ["Barry Schwartz","CEO, RustyBrick","10/photo-3-media.png"],
   ["Cyrus Shepard","Founder, Zyppy SEO","10/cyrus-shepard-media.png"],
   ["Dayana Collazos Ibarra","Pretty Little Marketer","10/dayana-collazos-ibarra-media.png"],
@@ -268,9 +269,9 @@ const byName = n => S.findIndex(s=>s.n===n);
 const BOUTS = [
   ["Ross Simmonds","Kevin Indig","Discovery and the customer journey in 2027"],
   ["Janine Anderson","Crystal Carter","Keynote: what if the rift between publishers and Google widens?"],
-  ["Kaleigh Moore","Nick LeRoy","What’s really coming if the AI bubble pops"],
+  ["Garrett Sussman","Nick LeRoy","What’s really coming if the AI bubble pops"],
   ["Alex Wright","Scott Hircombe","Agentic for production vs agentic for insights"],
-  ["Kiera Carter","Peter Mollins","Brand visibility in 2027: what winning looks like"],
+  ["Rebecca Tomasis","Peter Mollins","Brand visibility in 2027: what winning looks like"],
   ["Cyrus Shepard","Jillian Ryan","“Less traffic overall”: what’s the game plan?"],
   ["Aleyda Solís","Joe Glover","Panel: what’s actually changing in 2027"],
   ["Mordy Oberstein","Andreea Stefan","Opening round: welcome to Foresight 2027"],
@@ -287,12 +288,7 @@ const tiles = S.map((s,i)=>{
   grid.appendChild(t);
   return t;
 });
-const rnd = document.createElement("div");
-rnd.className = "tile rand";
-rnd.innerHTML = `<span>?</span><div class="ring"></div><span class="badge b1">1P</span><span class="badge b2">2P</span>`;
-grid.appendChild(rnd);
-tiles.push(rnd);
-const N = tiles.length; // 24
+const N = tiles.length; // 24 speakers, 6×4 grid
 
 const $ = (sel,root=document)=>root.querySelector(sel);
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
