@@ -225,7 +225,7 @@
 
   <div id="grid"></div>
   <div id="hover"><div class="nm"></div><div class="rl"></div></div>
-  <footer>24 speakers · 1 conference · zero scripted answers</footer>
+  <footer>23 speakers · 1 conference · zero scripted answers</footer>
 
   <div id="vs">
     <div class="half l"><img alt=""><div class="who"></div></div>
@@ -257,7 +257,6 @@ const S = [
   ["Cyrus Shepard","Founder, Zyppy SEO","10/cyrus-shepard-media.png"],
   ["Dayana Collazos Ibarra","Pretty Little Marketer","10/dayana-collazos-ibarra-media.png"],
   ["Jillian Ryan","Content Strategy, Intuit Mailchimp","10/jillian-ryan-media.png"],
-  ["Joe Glover","Co-Founder, The Marketing Meetup","10/joe-glover-1-media.png"],
   ["Aleyda Solís","Founder, Orainti","10/aleyda-solis-media.png"],
   ["Anthony Barone","Co-Founder, StudioHawk UK","10/anthony-barone-media.png"],
   ["Filipa Canelas","Co-Founder, MKTK","10/filipa-canelas-media.png"],
@@ -273,7 +272,7 @@ const BOUTS = [
   ["Alex Wright","Scott Hircombe","Agentic for production vs agentic for insights"],
   ["Rebecca Tomasis","Peter Mollins","Brand visibility in 2027: what winning looks like"],
   ["Cyrus Shepard","Jillian Ryan","“Less traffic overall”: what’s the game plan?"],
-  ["Aleyda Solís","Joe Glover","Panel: what’s actually changing in 2027"],
+  ["Aleyda Solís","Anthony Barone","Panel: what’s actually changing in 2027"],
   ["Mordy Oberstein","Andreea Stefan","Opening round: welcome to Foresight 2027"],
 ];
 
@@ -288,7 +287,12 @@ const tiles = S.map((s,i)=>{
   grid.appendChild(t);
   return t;
 });
-const N = tiles.length; // 24 speakers, 6×4 grid
+const rnd = document.createElement("div");
+rnd.className = "tile rand";
+rnd.innerHTML = `<span>?</span><div class="ring"></div><span class="badge b1">1P</span><span class="badge b2">2P</span>`;
+grid.appendChild(rnd);
+tiles.push(rnd);
+const N = tiles.length; // 23 speakers + "?" tile, 6×4 grid
 
 const $ = (sel,root=document)=>root.querySelector(sel);
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
